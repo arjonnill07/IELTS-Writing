@@ -14,6 +14,7 @@ import {
   Volume2, 
   Play,
   ChevronRight,
+  ChevronLeft,
   Info,
   Map as MapIcon,
   Columns as BarIcon,
@@ -573,6 +574,14 @@ export default function App() {
     }
   }, [filteredVocab]);
 
+  // Scroll active word into view
+  useEffect(() => {
+    const el = document.getElementById(`word-${selectedWord.word}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }, [selectedWord.word]);
+
   const speak = (text: string) => {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 0.9;
@@ -651,33 +660,36 @@ export default function App() {
       </header>
 
       {/* Main Grid */}
-      <main className="w-full max-w-7xl mx-auto px-6 mt-8 lg:mt-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+      <main className="w-full max-w-5xl mx-auto px-6 mt-8 lg:mt-12 flex flex-col gap-8 md:gap-10 items-start">
         
-        {/* Navigation Sidebar - Horizontal scroll on mobile */}
-        <div className="lg:col-span-3 order-2 lg:order-1 flex flex-col gap-5 lg:sticky lg:top-[180px] z-20">
-          <div className="relative group">
+        {/* Content Area */}
+        <div className="w-full flex flex-col gap-6 md:gap-8">
+          
+          {/* Search Above Visualization */}
+          <div className="relative group w-full">
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-ink/20 group-focus-within:text-accent transition-colors" size={16} />
             <input 
               type="text" 
               placeholder="Search Band 9 Lexis..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 bg-white border border-ink/10 rounded-2xl text-[11px] font-semibold uppercase tracking-widest focus:outline-none focus:ring-4 focus:ring-accent/5 focus:border-accent/40 transition-all shadow-sm"
+              className="w-full pl-12 pr-4 py-4 bg-white border border-ink/5 rounded-[24px] text-[11px] font-bold uppercase tracking-widest focus:outline-none focus:ring-4 focus:ring-accent/5 focus:border-accent/40 transition-all shadow-sm"
             />
           </div>
 
-          <div className="flex lg:flex-col lg:h-[550px] overflow-x-auto lg:overflow-y-auto bg-white border border-ink/10 rounded-[28px] md:rounded-[36px] p-2 md:p-2.5 gap-2 md:space-y-1.5 custom-scrollbar shadow-sm relative group/list no-scrollbar lg:block">
-             <div className="sticky top-0 h-6 bg-gradient-to-b from-white via-white/80 to-transparent z-10 hidden lg:block" />
-             <div className="flex lg:flex-col gap-2 min-w-max lg:min-w-0">
+          {/* Word Selection Box - Now below search */}
+          <div className="w-full flex overflow-x-auto bg-white border border-ink/10 rounded-[28px] md:rounded-[36px] p-2 md:p-2.5 gap-2 custom-scrollbar shadow-sm relative group/list no-scrollbar">
+             <div className="flex gap-2 min-w-max">
                <AnimatePresence mode="popLayout">
                   {filteredVocab.map((item) => (
                     <motion.button
                       layout
+                      id={`word-${item.word}`}
                       key={item.word}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       onClick={() => setSelectedWord(item)}
-                      className={`flex-shrink-0 lg:w-full group/btn flex items-center justify-between px-4 lg:px-5 py-3 lg:py-4.5 rounded-[18px] lg:rounded-[22px] transition-all duration-300 text-left border-2 ${
+                      className={`flex-shrink-0 group/btn flex items-center justify-between px-5 lg:px-6 py-3 lg:py-4.5 rounded-[20px] lg:rounded-[24px] transition-all duration-300 text-left border-2 ${
                         selectedWord.word === item.word 
                           ? 'bg-ink text-white border-ink shadow-2xl scale-[1.03]' 
                           : 'bg-transparent text-ink border-transparent hover:bg-ink/5 hover:border-ink/5'
@@ -695,25 +707,33 @@ export default function App() {
                           {item.word}
                         </span>
                       </div>
-                      <div className={`hidden lg:block transition-all duration-500 transform ${
-                        selectedWord.word === item.word ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0 bg-ink/10 p-1 rounded-lg'
-                      }`}>
-                         <ChevronRight size={16} className="text-accent" />
-                      </div>
                     </motion.button>
                   ))}
                </AnimatePresence>
              </div>
-             <div className="sticky bottom-0 h-6 bg-gradient-to-t from-white via-white/80 to-transparent z-10 hidden lg:block" />
           </div>
-        </div>
 
-        {/* Content Area - Order 1 on mobile */}
-        <div className="lg:col-span-9 order-1 lg:order-2 flex flex-col gap-8 md:gap-10">
-          
+
           {/* Main Visualizer + Example */}
           <div className="grid grid-cols-1 xl:grid-cols-5 gap-6 md:gap-8 bg-white p-2 md:p-4 rounded-[40px] md:rounded-[48px] shadow-sm border border-ink/5 overflow-hidden">
-            <div className="xl:col-span-3 aspect-video bg-ink/5 rounded-[32px] md:rounded-[40px] overflow-hidden relative group">
+            <motion.div 
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              onDragEnd={(e, info) => {
+                const threshold = 50;
+                const idx = filteredVocab.findIndex(v => v.word === selectedWord.word);
+                if (info.offset.x < -threshold) {
+                   // Swipe Left -> Next
+                   const nextIdx = (idx + 1) % filteredVocab.length;
+                   setSelectedWord(filteredVocab[nextIdx]);
+                } else if (info.offset.x > threshold) {
+                   // Swipe Right -> Prev
+                   const prevIdx = (idx - 1 + filteredVocab.length) % filteredVocab.length;
+                   setSelectedWord(filteredVocab[prevIdx]);
+                }
+              }}
+              className="xl:col-span-3 aspect-video bg-ink/5 rounded-[32px] md:rounded-[40px] overflow-hidden relative group cursor-grab active:cursor-grabbing"
+            >
               <TrendVisualizer 
                 type={selectedWord.type} 
                 word={selectedWord.word} 
@@ -721,11 +741,34 @@ export default function App() {
                 isAnimating={isAnimating} 
               />
               
-              <div className="absolute top-4 left-4 md:top-8 md:left-8">
+              <div className="absolute top-4 left-4 md:top-8 md:left-8 flex items-center gap-3">
                  <div className="px-4 py-2 md:px-6 md:py-3 bg-ink text-bg rounded-xl md:rounded-2xl shadow-2xl">
                    <h2 className="font-display font-medium text-2xl md:text-5xl uppercase tracking-tighter leading-none">
                      {selectedWord.word}
                    </h2>
+                 </div>
+                 
+                 <div className="flex gap-2 lg:hidden">
+                    <button 
+                      onClick={() => {
+                        const idx = filteredVocab.findIndex(v => v.word === selectedWord.word);
+                        const prevIdx = (idx - 1 + filteredVocab.length) % filteredVocab.length;
+                        setSelectedWord(filteredVocab[prevIdx]);
+                      }}
+                      className="w-10 h-10 bg-white/90 backdrop-blur shadow-xl rounded-full flex items-center justify-center text-ink active:scale-95"
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+                    <button 
+                      onClick={() => {
+                        const idx = filteredVocab.findIndex(v => v.word === selectedWord.word);
+                        const nextIdx = (idx + 1) % filteredVocab.length;
+                        setSelectedWord(filteredVocab[nextIdx]);
+                      }}
+                      className="w-10 h-10 bg-white/90 backdrop-blur shadow-xl rounded-full flex items-center justify-center text-ink active:scale-95"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
                  </div>
               </div>
 
@@ -743,7 +786,7 @@ export default function App() {
               >
                 <Volume2 size={20} className="md:w-6 md:h-6" />
               </button>
-            </div>
+            </motion.div>
 
                <div className="xl:col-span-2 flex flex-col justify-center p-4 md:p-6 relative">
                   {(selectedWord as any).impactTip && (

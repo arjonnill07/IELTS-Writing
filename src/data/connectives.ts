@@ -143,5 +143,29 @@ export const CONNECTIVES_DATA: Connective[] = [
     phrase: "Yielding...",
     example: "The reaction was heated for two hours, yielding a stable chemical compound.",
     usageRule: "Use at the end of a process description sentence to show the output."
+  },
+  {
+    category: 'Contrast',
+    phrase: "While this was true for X, the reverse was the case for Y.",
+    example: "While this was true for the automotive sector, the reverse was the case for renewables.",
+    usageRule: "A complex comparative structure for high-level Task 1 reports."
+  },
+  {
+    category: 'Addition',
+    phrase: "Complementing this trend is...",
+    example: "Exports rose by 20%. Complementing this trend is a similar rise in domestic production.",
+    usageRule: "A more visual way to add information that 'fits' with what was just said."
+  },
+  {
+    category: 'Result',
+    phrase: "Prompting...",
+    example: "The price of sugar dropped, prompting a surge in confectionery sales.",
+    usageRule: "Use a participle to show an immediate secondary reaction to a data change."
+  },
+  {
+    category: 'Sequence',
+    phrase: "Having completed the X stage, the process then...",
+    example: "Having completed the heating stage, the process then transitions to cooling.",
+    usageRule: "A perfect structure for advanced process reports using a perfect participle."
   }
 ];
