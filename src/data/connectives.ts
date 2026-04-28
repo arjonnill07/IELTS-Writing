@@ -65,5 +65,83 @@ export const CONNECTIVES_DATA: Connective[] = [
     phrase: "Just as... so too...",
     example: "Just as the demand for coal fell, so too did its market price.",
     usageRule: "A complex structure used to mirror two declining or rising trends."
+  },
+  {
+    category: 'Contrast',
+    phrase: "Notwithstanding this trend,",
+    example: "Prices rose in most sectors. Notwithstanding this trend, the technology sector remained stable.",
+    usageRule: "A high-level alternative to 'Despite this' to acknowledge an outlier."
+  },
+  {
+    category: 'Addition',
+    phrase: "In tandem with this,",
+    example: "Automation increased efficiency. In tandem with this, labor costs saw a 15% reduction.",
+    usageRule: "Used to describe two related events happening simultaneously or in coordination."
+  },
+  {
+    category: 'Result',
+    phrase: "With the inevitable result that...",
+    example: "Oil reserves were depleted, with the inevitable result that fuel prices skyrocketed.",
+    usageRule: "Connects a cause to a predictable and significant outcome."
+  },
+  {
+    category: 'Sequence',
+    phrase: "At this juncture in the process,",
+    example: "The components are sterilized. At this juncture in the process, they are transferred to the clean room.",
+    usageRule: "Specifically for process tasks to mark a precise moment or stage."
+  },
+  {
+    category: 'Comparison',
+    phrase: "By the same token,",
+    example: "Tourism creates jobs. By the same token, it can strain local infrastructure if unmanaged.",
+    usageRule: "Used to introduce an equally valid point or similar logic from a different angle."
+  },
+  {
+    category: 'Contrast',
+    phrase: "Albeit...",
+    example: "The industry saw growth, albeit at a slower pace than the previous decade.",
+    usageRule: "A sophisticated way to add a concession or qualification within a sentence."
+  },
+  {
+    category: 'Addition',
+    phrase: "Coupled with this is...",
+    example: "The rise in internet speed was notable. Coupled with this is the increasing affordability of devices.",
+    usageRule: "Links two positive or complementary factors together effectively."
+  },
+  {
+    category: 'Result',
+    phrase: "The corollary of this is that...",
+    example: "The budget was slashed. The corollary of this is that several key projects were abandoned.",
+    usageRule: "A highly academic way to show a logical consequence."
+  },
+  {
+    category: 'Contrast',
+    phrase: "This notwithstanding,",
+    example: "Revenue declined. This notwithstanding, the company expanded its workforce.",
+    usageRule: "A formal way to say 'In spite of this'."
+  },
+  {
+    category: 'Comparison',
+    phrase: "In a similar vein,",
+    example: "Exports of grain increased. In a similar vein, dairy exports also experienced growth.",
+    usageRule: "Ideal for showing a shared trend across different sectors."
+  },
+  {
+    category: 'Sequence',
+    phrase: "The final iteration of the cycle involves...",
+    example: "The final iteration of the cycle involves the cooling and packaging of the resulting liquid.",
+    usageRule: "Use to describe the concluding stage of a circular process."
+  },
+  {
+    category: 'Addition',
+    phrase: "Along with this,",
+    example: "The city built new parks. Along with this, bike lanes were installed across the downtown area.",
+    usageRule: "Simple but effective way to list multiple infrastructure changes."
+  },
+  {
+    category: 'Result',
+    phrase: "Yielding...",
+    example: "The reaction was heated for two hours, yielding a stable chemical compound.",
+    usageRule: "Use at the end of a process description sentence to show the output."
   }
 ];

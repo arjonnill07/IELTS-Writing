@@ -359,7 +359,7 @@ const CohesionEngine = () => {
       </div>
 
       <div className="flex gap-4 mb-12 overflow-x-auto no-scrollbar pb-2">
-        {(['Contrast', 'Comparison', 'Sequence', 'Result'] as Connective['category'][]).map(cat => (
+        {(['Contrast', 'Comparison', 'Sequence', 'Result', 'Addition'] as Connective['category'][]).map(cat => (
           <button
             key={cat}
             onClick={() => setActiveCategory(cat)}
@@ -381,15 +381,15 @@ const CohesionEngine = () => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: i * 0.1 }}
-            className="p-10 bg-white border border-ink/5 rounded-[40px] shadow-sm hover:shadow-xl transition-all group"
+            className="p-6 md:p-10 bg-white border border-ink/5 rounded-[32px] md:rounded-[40px] shadow-sm hover:shadow-xl transition-all group"
           >
             <div className="flex items-center gap-3 mb-6">
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent">Professional Linker</span>
               <div className="h-px flex-1 bg-accent/20" />
             </div>
-            <h4 className="text-3xl font-display font-bold uppercase mb-4 text-ink">{c.phrase}</h4>
+            <h4 className="text-2xl md:text-3xl font-display font-bold uppercase mb-4 text-ink">{c.phrase}</h4>
             <p className="text-sm font-medium text-ink/40 mb-8 italic">"{c.example}"</p>
-            <div className="flex items-start gap-3 p-4 bg-accent/5 rounded-2xl border border-accent/10 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex items-start gap-3 p-4 bg-accent/5 rounded-2xl border border-accent/10 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
               <Target size={14} className="text-accent mt-0.5" />
               <p className="text-[10px] font-bold text-accent/80 uppercase tracking-wide leading-relaxed">
                 Expert Rule: {c.usageRule}
@@ -409,7 +409,11 @@ const ParaphraseLab = () => {
     { title: "The Noun Shift", description: "Convert standard 'Verb + Adverb' structures into 'Adjective + Noun' phrases.", example: "Sales rose sharply -> A sharp rise in sales was observed." },
     { title: "Temporal Clause", description: "Replace standard 'From...to' with 'Over the period/decade in question'.", example: "From 1990 to 2000 -> Throughout the decade starting in 1990." },
     { title: "Lead Inversion", description: "Instead of starting with the category, start with the trend itself.", example: "The population grew -> Witnessing a growth of 10% was the population." },
-    { title: "Synonym Replacement", description: "Replace common verbs with precise academic alternatives.", example: "Went down -> Registered a contraction / Witnessed a plummet." }
+    { title: "Synonym Replacement", description: "Replace common verbs with precise academic alternatives.", example: "Went down -> Registered a contraction / Witnessed a plummet." },
+    { title: "The Passive Transformation", description: "Useful for process tasks where the focus is on the object, not the actor.", example: "Farmers collect the tea -> The tea leaves are collected by hand." },
+    { title: "Adverbial Embedding", description: "Integrate manner or degree directly into the verb phrase for flow.", example: "It changed a little -> It underwent a marginal modification." },
+    { title: "Nominalization", description: "Turning verbs into nouns to create more formal, objective sentence stems.", example: "The population decreased -> There was a discernible decrease in the population." },
+    { title: "Relative Clause Extension", description: "Adding detail without starting a new sentence using 'which' or 'where'.", example: "The rate fell. This was unexpected -> The rate fell, which was an unexpected development." }
   ];
 
   const paraphrases = [
@@ -425,6 +429,11 @@ const ParaphraseLab = () => {
     { cat: 'Quantity', from: "Mostly", to: "Predominantly / The vast majority", tip: "Stronger academic adverbs for over 50% shares." },
     { cat: 'Time', from: "From start to finish", to: "Throughout the period shown", tip: "A professional opening for trend descriptions." },
     { cat: 'Trend', from: "Went down", to: "Registered a contraction", tip: "Financial graphs often 'contract' rather than just 'fall'." },
+    { cat: 'Structure', from: "It was changed into", to: "It was transformed into / repurposed as", tip: "Crucial for Map tasks where buildings change function." },
+    { cat: 'Quantity', from: "Smallest part", to: "A negligible minority / Marginal segment", tip: "Use for portions below 5% in pie charts." },
+    { cat: 'Trend', from: "Keep going down", to: "Continued its downward trajectory", tip: "Using 'trajectory' adds a geometric precision to your English." },
+    { cat: 'Structure', from: "There are four steps", to: "The process is comprised of four distinct stages", tip: "Good for the overview sentence in a process task." },
+    { cat: 'Quantity', from: "A lot more", to: "A significant preponderance", tip: "A very high-level way to describe a clear majority." },
   ];
 
   const filtered = activeCategory === 'All' ? paraphrases : paraphrases.filter(p => p.cat === activeCategory);
