@@ -434,6 +434,11 @@ const ParaphraseLab = () => {
     { cat: 'Trend', from: "Keep going down", to: "Continued its downward trajectory", tip: "Using 'trajectory' adds a geometric precision to your English." },
     { cat: 'Structure', from: "There are four steps", to: "The process is comprised of four distinct stages", tip: "Good for the overview sentence in a process task." },
     { cat: 'Quantity', from: "A lot more", to: "A significant preponderance", tip: "A very high-level way to describe a clear majority." },
+    { cat: 'Structure', from: "Old building was replaced", to: "The former structure was superseded by", tip: "A Band 9 way to describe modernization in Map tasks." },
+    { cat: 'Time', from: "At the end", to: "By the terminus of the period", tip: "Professional vocabulary for the final data point." },
+    { cat: 'Trend', from: "Fluctuated", to: "Exhibited a degree of volatility", tip: "Use 'volatility' for erratic or frequent changes." },
+    { cat: 'Quantity', from: "Equal numbers", to: "An identical distribution", tip: "Great for comparing two equal pie slices." },
+    { cat: 'Structure', from: "Goes through", to: "Permeates through the subsequent stages of", tip: "Use for liquids or materials moving through a process." },
   ];
 
   const filtered = activeCategory === 'All' ? paraphrases : paraphrases.filter(p => p.cat === activeCategory);
@@ -561,6 +566,13 @@ export default function App() {
     return base;
   }, [activeChart, searchQuery]);
 
+  // Sync selected word whenever filtered list changes significantly (e.g. category switch)
+  useEffect(() => {
+    if (filteredVocab.length > 0 && !filteredVocab.find(v => v.word === selectedWord.word)) {
+      setSelectedWord(filteredVocab[0]);
+    }
+  }, [filteredVocab]);
+
   const speak = (text: string) => {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 0.9;
@@ -621,7 +633,10 @@ export default function App() {
             {(['ALL', 'LINE_GRAPH', 'BAR_CHART', 'PIE_CHART', 'MAP', 'PROCESS', 'TABLE'] as const).map((t) => (
               <button
                 key={t}
-                onClick={() => setActiveChart(t)}
+                onClick={() => {
+                  setActiveChart(t);
+                  setSearchQuery('');
+                }}
                 className={`flex-shrink-0 flex items-center gap-2.5 px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all ${
                   activeChart === t 
                     ? 'bg-accent text-white shadow-[0_8px_20px_rgba(var(--color-accent),0.25)] scale-105 z-10' 
@@ -638,7 +653,7 @@ export default function App() {
       {/* Main Grid */}
       <main className="w-full max-w-7xl mx-auto px-6 mt-8 lg:mt-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
         
-        {/* Navigation Sidebar - Moved to order-2 on mobile */}
+        {/* Navigation Sidebar - Horizontal scroll on mobile */}
         <div className="lg:col-span-3 order-2 lg:order-1 flex flex-col gap-5 lg:sticky lg:top-[180px] z-20">
           <div className="relative group">
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-ink/20 group-focus-within:text-accent transition-colors" size={16} />
@@ -651,46 +666,45 @@ export default function App() {
             />
           </div>
 
-          <div className="h-[300px] lg:h-[550px] overflow-y-auto bg-white border border-ink/10 rounded-[36px] p-2.5 space-y-1.5 custom-scrollbar shadow-sm relative group/list">
-             <div className="sticky top-0 h-6 bg-gradient-to-b from-white via-white/80 to-transparent z-10" />
-             <AnimatePresence mode="popLayout">
-                {filteredVocab.map((item) => (
-                  <motion.button
-                    layout
-                    key={item.word}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    onClick={() => setSelectedWord(item)}
-                    className={`w-full group/btn flex items-center justify-between px-5 py-4.5 rounded-[22px] transition-all duration-300 text-left border-2 ${
-                      selectedWord.word === item.word 
-                        ? 'bg-ink text-white border-ink shadow-2xl scale-[1.03]' 
-                        : 'bg-transparent text-ink border-transparent hover:bg-ink/5 hover:border-ink/5'
-                    }`}
-                  >
-                    <div className="flex flex-col items-start truncate pr-2">
-                       <div className="flex items-center gap-2 mb-1">
-                          <span className={`text-[8px] font-black uppercase tracking-widest ${
-                            selectedWord.word === item.word ? 'text-accent' : 'text-ink/30'
-                          }`}>
-                            {item.type}
-                          </span>
-                          {selectedWord.word === item.word && (
-                             <motion.div layoutId="dot" className="w-1 h-1 bg-accent rounded-full" />
-                          )}
-                       </div>
-                       <span className="font-display font-medium text-[15px] leading-tight uppercase truncate">
-                        {item.word}
-                      </span>
-                    </div>
-                    <div className={`transition-all duration-500 transform ${
-                      selectedWord.word === item.word ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0 bg-ink/10 p-1 rounded-lg'
-                    }`}>
-                       <ChevronRight size={16} className="text-accent" />
-                    </div>
-                  </motion.button>
-                ))}
-             </AnimatePresence>
-             <div className="sticky bottom-0 h-6 bg-gradient-to-t from-white via-white/80 to-transparent z-10" />
+          <div className="flex lg:flex-col lg:h-[550px] overflow-x-auto lg:overflow-y-auto bg-white border border-ink/10 rounded-[28px] md:rounded-[36px] p-2 md:p-2.5 gap-2 md:space-y-1.5 custom-scrollbar shadow-sm relative group/list no-scrollbar lg:block">
+             <div className="sticky top-0 h-6 bg-gradient-to-b from-white via-white/80 to-transparent z-10 hidden lg:block" />
+             <div className="flex lg:flex-col gap-2 min-w-max lg:min-w-0">
+               <AnimatePresence mode="popLayout">
+                  {filteredVocab.map((item) => (
+                    <motion.button
+                      layout
+                      key={item.word}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      onClick={() => setSelectedWord(item)}
+                      className={`flex-shrink-0 lg:w-full group/btn flex items-center justify-between px-4 lg:px-5 py-3 lg:py-4.5 rounded-[18px] lg:rounded-[22px] transition-all duration-300 text-left border-2 ${
+                        selectedWord.word === item.word 
+                          ? 'bg-ink text-white border-ink shadow-2xl scale-[1.03]' 
+                          : 'bg-transparent text-ink border-transparent hover:bg-ink/5 hover:border-ink/5'
+                      }`}
+                    >
+                      <div className="flex flex-col items-start truncate pr-2">
+                         <div className="flex items-center gap-2 mb-0.5 lg:mb-1">
+                            <span className={`text-[7px] lg:text-[8px] font-black uppercase tracking-widest ${
+                              selectedWord.word === item.word ? 'text-accent' : 'text-ink/30'
+                            }`}>
+                              {item.type}
+                            </span>
+                         </div>
+                         <span className="font-display font-medium text-[13px] lg:text-[15px] leading-tight uppercase truncate">
+                          {item.word}
+                        </span>
+                      </div>
+                      <div className={`hidden lg:block transition-all duration-500 transform ${
+                        selectedWord.word === item.word ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0 bg-ink/10 p-1 rounded-lg'
+                      }`}>
+                         <ChevronRight size={16} className="text-accent" />
+                      </div>
+                    </motion.button>
+                  ))}
+               </AnimatePresence>
+             </div>
+             <div className="sticky bottom-0 h-6 bg-gradient-to-t from-white via-white/80 to-transparent z-10 hidden lg:block" />
           </div>
         </div>
 
