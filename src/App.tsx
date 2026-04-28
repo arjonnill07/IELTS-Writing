@@ -163,36 +163,95 @@ const TrendVisualizer = ({ type, word, category, isAnimating }: { type: string, 
   }
 
   // 4. PROCESS VISUAL
+  const [activeStage, setActiveStage] = useState<number | null>(null);
+
   if (category.includes('PROCESS')) {
+    const getStageLabel = (i: number) => {
+      if (i === 0) return { title: "Introduction", tip: "Use 'initiates' or 'commences' to signal the start of the sequence." };
+      if (i === 1) return { title: "Transformation", tip: "Use 'undergoes' or 'is subjected to' for changes in state or material." };
+      return { title: "Conclusion", tip: "Use 'culminates' or 'concludes' to wrap up the report with authority." };
+    };
+
     return (
-      <div className="relative w-full h-full bg-white/40 border border-ink/10 rounded-xl flex items-center justify-center p-8 overflow-hidden gap-4">
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="flex items-center gap-4">
-            <motion.div 
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={isAnimating ? { scale: 1, opacity: 1 } : { scale: 0.8, opacity: 0 }}
-              transition={{ delay: i * 0.3 }}
-              className={`w-16 h-16 rounded-2xl flex items-center justify-center border-2 ${
-                (i === 0 && word.includes('initiates')) || 
-                (i === 2 && word.includes('culminates')) ||
-                (i === 1 && word.includes('undergoes'))
-                  ? 'bg-accent border-accent text-white shadow-xl rotate-3' 
-                  : 'bg-white border-ink/5 text-ink/20'
-              }`}
-            >
-              <Zap size={20} className={i === 1 ? 'animate-pulse' : ''} />
-            </motion.div>
-            {i < 2 && (
-              <motion.div 
-                initial={{ width: 0, opacity: 0 }}
-                animate={isAnimating ? { width: 32, opacity: 1 } : { width: 0, opacity: 0 }}
-                transition={{ delay: i * 0.3 + 0.15 }}
+      <div className="relative w-full h-full bg-white/40 border border-ink/10 rounded-xl flex flex-col items-center justify-center p-8 overflow-hidden">
+        <div className="flex items-center gap-4 z-10">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="flex items-center gap-4">
+              <motion.button
+                onClick={() => setActiveStage(i === activeStage ? null : i)}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={isAnimating ? { 
+                  scale: activeStage === i ? 1.2 : 1, 
+                  opacity: 1,
+                  rotate: activeStage === i ? [0, -5, 5, 0] : 0
+                } : { scale: 0.8, opacity: 0 }}
+                transition={{ 
+                  delay: i * 0.3,
+                  rotate: { duration: 0.5, repeat: activeStage === i ? Infinity : 0, repeatType: "reverse" }
+                }}
+                className={`w-16 h-16 md:w-20 md:h-20 rounded-[24px] flex flex-col items-center justify-center border-2 transition-all group relative ${
+                  activeStage === i 
+                    ? 'bg-accent border-accent text-white shadow-2xl scale-110 z-20' 
+                    : ((i === 0 && word.includes('initiates')) || 
+                       (i === 2 && word.includes('culminates')) ||
+                       (i === 1 && word.includes('undergoes')))
+                        ? 'bg-white border-accent text-accent shadow-lg animate-pulse'
+                        : 'bg-white border-ink/5 text-ink/20 hover:border-accent/40 hover:text-accent/40'
+                }`}
               >
-                <ChevronRight className="text-ink/10" />
-              </motion.div>
-            )}
-          </div>
-        ))}
+                <Zap size={20} className={activeStage === i ? 'animate-bounce' : ''} />
+                <span className="text-[7px] font-black uppercase mt-1">Stage {i + 1}</span>
+                
+                {activeStage === i && (
+                  <motion.div 
+                    layoutId="active-glow"
+                    className="absolute inset-0 bg-accent rounded-[24px] blur-xl opacity-20 -z-10"
+                  />
+                )}
+              </motion.button>
+              {i < 2 && (
+                <motion.div 
+                  initial={{ width: 0, opacity: 0 }}
+                  animate={isAnimating ? { width: 32, opacity: 1 } : { width: 0, opacity: 0 }}
+                  transition={{ delay: i * 0.3 + 0.15 }}
+                >
+                  <ChevronRight className={activeStage === i ? 'text-accent' : 'text-ink/10'} />
+                </motion.div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <AnimatePresence>
+          {activeStage !== null && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[80%] bg-ink text-white p-6 rounded-2xl shadow-2xl border border-white/10 z-30"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <Target size={16} className="text-accent" />
+                <h5 className="text-[10px] font-black uppercase tracking-widest text-accent">
+                  {getStageLabel(activeStage).title} Advisor
+                </h5>
+              </div>
+              <p className="text-xs font-medium leading-relaxed opacity-80">
+                {getStageLabel(activeStage).tip}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {!activeStage && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="absolute bottom-6 text-[9px] font-black text-ink/20 uppercase tracking-[0.2em] animate-pulse"
+          >
+            Click a stage to simulate transition
+          </motion.div>
+        )}
       </div>
     );
   }
@@ -568,10 +627,10 @@ export default function App() {
       </header>
 
       {/* Main Grid */}
-      <main className="w-full max-w-7xl mx-auto px-6 mt-12 grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+      <main className="w-full max-w-7xl mx-auto px-6 mt-8 lg:mt-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
         
-        {/* Navigation Sidebar */}
-        <div className="lg:col-span-3 flex flex-col gap-5 lg:sticky lg:top-[180px] z-20">
+        {/* Navigation Sidebar - Moved to order-2 on mobile */}
+        <div className="lg:col-span-3 order-2 lg:order-1 flex flex-col gap-5 lg:sticky lg:top-[180px] z-20">
           <div className="relative group">
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-ink/20 group-focus-within:text-accent transition-colors" size={16} />
             <input 
@@ -626,12 +685,12 @@ export default function App() {
           </div>
         </div>
 
-        {/* Content Area */}
-        <div className="lg:col-span-9 flex flex-col gap-10">
+        {/* Content Area - Order 1 on mobile */}
+        <div className="lg:col-span-9 order-1 lg:order-2 flex flex-col gap-8 md:gap-10">
           
           {/* Main Visualizer + Example */}
-          <div className="grid grid-cols-1 xl:grid-cols-5 gap-8 bg-white p-4 rounded-[48px] shadow-sm border border-ink/5">
-            <div className="xl:col-span-3 aspect-video bg-ink/5 rounded-[40px] overflow-hidden relative group">
+          <div className="grid grid-cols-1 xl:grid-cols-5 gap-6 md:gap-8 bg-white p-2 md:p-4 rounded-[40px] md:rounded-[48px] shadow-sm border border-ink/5 overflow-hidden">
+            <div className="xl:col-span-3 aspect-video bg-ink/5 rounded-[32px] md:rounded-[40px] overflow-hidden relative group">
               <TrendVisualizer 
                 type={selectedWord.type} 
                 word={selectedWord.word} 
@@ -639,17 +698,17 @@ export default function App() {
                 isAnimating={isAnimating} 
               />
               
-              <div className="absolute top-6 left-6 md:top-8 md:left-8">
-                 <div className="px-6 py-3 bg-ink text-bg rounded-2xl shadow-2xl">
-                   <h2 className="font-display font-medium text-3xl md:text-5xl uppercase tracking-tighter leading-none">
+              <div className="absolute top-4 left-4 md:top-8 md:left-8">
+                 <div className="px-4 py-2 md:px-6 md:py-3 bg-ink text-bg rounded-xl md:rounded-2xl shadow-2xl">
+                   <h2 className="font-display font-medium text-2xl md:text-5xl uppercase tracking-tighter leading-none">
                      {selectedWord.word}
                    </h2>
                  </div>
               </div>
 
-              <div className="absolute bottom-6 left-6 flex gap-2">
+              <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8 flex gap-1.5 md:gap-2">
                  {selectedWord.chartCategory.map(cat => (
-                   <span key={cat} className="px-3 py-1 bg-white shadow-md rounded-full text-[8px] font-black uppercase tracking-widest text-ink">
+                   <span key={cat} className="px-2 py-1 md:px-3 md:py-1 bg-white shadow-md rounded-full text-[7px] md:text-[8px] font-black uppercase tracking-widest text-ink">
                      {cat.replace('_', ' ')}
                    </span>
                  ))}
@@ -657,18 +716,18 @@ export default function App() {
 
               <button 
                 onClick={() => speak(selectedWord.word)}
-                className="absolute bottom-6 right-6 p-4 md:p-5 bg-accent text-white rounded-2xl shadow-xl hover:scale-110 active:scale-95 transition-all"
+                className="absolute bottom-4 right-4 md:bottom-8 md:right-8 p-3.5 md:p-5 bg-accent text-white rounded-xl md:rounded-2xl shadow-xl hover:scale-110 active:scale-95 transition-all"
               >
-                <Volume2 size={24} />
+                <Volume2 size={20} className="md:w-6 md:h-6" />
               </button>
             </div>
 
-               <div className="xl:col-span-2 flex flex-col justify-center p-4 relative">
+               <div className="xl:col-span-2 flex flex-col justify-center p-4 md:p-6 relative">
                   {(selectedWord as any).impactTip && (
                     <motion.div 
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="absolute -top-4 right-4 p-4 bg-ink text-white rounded-2xl shadow-xl flex items-start gap-3 border border-white/10 z-20 max-w-[200px]"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="mb-6 lg:absolute lg:-top-4 lg:right-4 p-4 bg-ink text-white rounded-2xl shadow-xl flex items-start gap-3 border border-white/10 z-20 lg:max-w-[200px]"
                     >
                       <Target size={16} className="text-accent shrink-0 mt-1" />
                       <p className="text-[10px] font-bold uppercase tracking-wide leading-relaxed">
@@ -676,16 +735,16 @@ export default function App() {
                       </p>
                     </motion.div>
                   )}
-               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent mb-6 block">Band 9 Sentence Structure</span>
-               <p className="text-xl md:text-2xl font-display font-light leading-relaxed italic opacity-90 border-l-4 border-accent/20 pl-6">
+               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent mb-4 md:mb-6 block">Band 9 Sentence Structure</span>
+               <p className="text-lg md:text-2xl font-display font-light leading-relaxed italic opacity-90 border-l-4 border-accent/20 pl-6">
                  "{activeSentence}"
                </p>
                
-               <div className="mt-10">
+               <div className="mt-8 md:mt-10">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-ink/30 block mb-4">High-Score Collocations</span>
                   <div className="flex flex-wrap gap-2">
                     {(selectedWord as any).collocations?.map((c: string) => (
-                      <span key={c} className="px-3 py-1 bg-accent/10 border border-accent/20 text-accent rounded-full text-[9px] font-black uppercase tracking-widest">
+                      <span key={c} className="px-3 py-1 bg-accent/10 border border-accent/20 text-accent rounded-full text-[8px] md:text-[9px] font-black uppercase tracking-widest">
                          {c}
                       </span>
                     )) || (
@@ -694,14 +753,14 @@ export default function App() {
                   </div>
                </div>
 
-               <div className="mt-10">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-ink/30 block mb-4">Synonyms to use (Click to view usage)</span>
+               <div className="mt-8 md:mt-10">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-ink/30 block mb-4">Synonyms to use (Click usage)</span>
                   <div className="flex flex-wrap gap-2">
                     {selectedWord.synonyms?.map(s => (
                       <button 
                         key={s} 
                         onClick={() => handleSynonymClick(s)}
-                        className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${
+                        className={`px-3 py-1.5 rounded-lg text-[8px] md:text-[9px] font-black uppercase tracking-widest transition-all ${
                           activeSynonym === s 
                             ? 'bg-accent text-white shadow-lg scale-105' 
                             : 'bg-ink/5 text-ink/60 hover:bg-accent/10 hover:text-accent'
@@ -714,6 +773,7 @@ export default function App() {
                </div>
             </div>
           </div>
+
 
           {/* Bottom Row: Sentence Mastery Lab */}
           <div className="p-8 md:p-12 bg-white border border-ink/5 rounded-[40px] shadow-xl relative overflow-hidden">
