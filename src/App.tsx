@@ -93,12 +93,15 @@ const TrendVisualizer = ({ type, word, category, isAnimating }: { type: string, 
             <div className="absolute inset-0 bg-ink/5 rounded-2xl border-2 border-ink/10" />
             {type === 'Map Change' ? (
               <motion.div 
-                className="absolute inset-4 bg-accent/20 border-2 border-accent rounded-xl flex items-center justify-center"
+                className="absolute inset-4 bg-accent/20 border-2 border-accent rounded-xl flex items-center justify-center p-4 text-center"
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={isAnimating ? { scale: 1, opacity: 1 } : { scale: 0.8, opacity: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                <RefreshCw className="text-accent animate-spin-slow" size={32} />
+                <div className="flex flex-col items-center gap-2">
+                  <RefreshCw className="text-accent animate-spin-slow" size={24} />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-accent leading-none">{word}</span>
+                </div>
               </motion.div>
             ) : (
               <motion.div 
@@ -170,7 +173,9 @@ const TrendVisualizer = ({ type, word, category, isAnimating }: { type: string, 
               animate={isAnimating ? { scale: 1, opacity: 1 } : { scale: 0.8, opacity: 0 }}
               transition={{ delay: i * 0.3 }}
               className={`w-16 h-16 rounded-2xl flex items-center justify-center border-2 ${
-                (i === 0 && word.includes('initiates')) || (i === 2 && word.includes('culminates'))
+                (i === 0 && word.includes('initiates')) || 
+                (i === 2 && word.includes('culminates')) ||
+                (i === 1 && word.includes('undergoes'))
                   ? 'bg-accent border-accent text-white shadow-xl rotate-3' 
                   : 'bg-white border-ink/5 text-ink/20'
               }`}
@@ -520,18 +525,18 @@ export default function App() {
     <div className="min-h-screen font-sans bg-[#F8FAFC] text-ink selection:bg-accent/30 selection:text-ink pb-20">
       {/* Header */}
       <header className="sticky top-0 z-40 w-full bg-[#F8FAFC] border-b border-ink/5 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="max-w-7xl mx-auto px-6 py-3 md:py-5 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-6">
           <div>
-            <h1 className="font-display font-medium text-3xl md:text-5xl tracking-tighter">
+            <h1 className="font-display font-medium text-2xl md:text-5xl tracking-tighter">
               IELTsvision<span className="text-accent">.</span>
             </h1>
             <p className="hidden md:block text-ink/20 text-[8px] font-black uppercase tracking-[0.4em] mt-1">Lexical Intelligence Engine</p>
           </div>
-          <div className="flex gap-2 p-1.5 bg-ink/5 rounded-2xl border border-ink/5">
-             <button className="px-6 py-2.5 text-[9px] font-black uppercase tracking-widest bg-ink text-white rounded-xl shadow-xl transition-transform active:scale-95">The Engine</button>
+          <div className="flex gap-2 p-1 bg-ink/5 rounded-2xl border border-ink/5 md:p-1.5">
+             <button className="px-4 md:px-6 py-2 md:py-2.5 text-[8px] md:text-[9px] font-black uppercase tracking-widest bg-ink text-white rounded-xl shadow-xl transition-transform active:scale-95">The Engine</button>
              <button 
               onClick={() => document.getElementById('paraphrase-lab')?.scrollIntoView({ behavior: 'smooth' })}
-              className="px-6 py-2.5 text-[9px] font-black uppercase tracking-widest text-ink/40 hover:text-ink transition-all active:scale-95"
+              className="px-4 md:px-6 py-2 md:py-2.5 text-[8px] md:text-[9px] font-black uppercase tracking-widest text-ink/40 hover:text-ink transition-all active:scale-95"
              >
                Paraphrase Lab
              </button>
@@ -540,7 +545,7 @@ export default function App() {
 
         {/* Global Filter Bar */}
         <div className="bg-white/50 border-t border-ink/5">
-          <div className="max-w-7xl mx-auto px-6 py-3.5 flex items-center overflow-x-auto no-scrollbar gap-1.5">
+          <div className="max-w-7xl mx-auto px-6 py-2 md:py-3.5 flex items-center overflow-x-auto no-scrollbar gap-1.5">
             <div className="flex items-center gap-2 mr-6 shrink-0 opacity-40">
               <Zap size={12} className="text-accent" />
               <span className="text-[9px] font-black uppercase tracking-widest">Select Task:</span>
@@ -566,7 +571,7 @@ export default function App() {
       <main className="w-full max-w-7xl mx-auto px-6 mt-12 grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
         
         {/* Navigation Sidebar */}
-        <div className="lg:col-span-3 flex flex-col gap-5 sticky top-[180px] z-20">
+        <div className="lg:col-span-3 flex flex-col gap-5 lg:sticky lg:top-[180px] z-20">
           <div className="relative group">
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-ink/20 group-focus-within:text-accent transition-colors" size={16} />
             <input 
@@ -578,7 +583,7 @@ export default function App() {
             />
           </div>
 
-          <div className="h-[550px] overflow-y-auto bg-white border border-ink/10 rounded-[36px] p-2.5 space-y-1.5 custom-scrollbar shadow-sm relative group/list">
+          <div className="h-[300px] lg:h-[550px] overflow-y-auto bg-white border border-ink/10 rounded-[36px] p-2.5 space-y-1.5 custom-scrollbar shadow-sm relative group/list">
              <div className="sticky top-0 h-6 bg-gradient-to-b from-white via-white/80 to-transparent z-10" />
              <AnimatePresence mode="popLayout">
                 {filteredVocab.map((item) => (
